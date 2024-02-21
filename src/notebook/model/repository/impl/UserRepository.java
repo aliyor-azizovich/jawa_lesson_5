@@ -34,7 +34,7 @@ public class UserRepository implements GBRepository {
         long max = 0L;
         for (User u : users) {
             long id = u.getId();
-            if (max < id){
+            if (max < id) {
                 max = id;
             }
         }
@@ -57,21 +57,34 @@ public class UserRepository implements GBRepository {
                 .filter(u -> u.getId()
                         .equals(userId))
                 .findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-        editUser.setFirstName(update.getFirstName());
-        editUser.setLastName(update.getLastName());
-        editUser.setPhone(update.getPhone());
+        if (!update.getFirstName().isEmpty()) {
+            editUser.setFirstName(update.getFirstName());
+        }
+        if (!update.getLastName().isEmpty()) {
+            editUser.setLastName(update.getLastName());
+        }
+        if (!update.getPhone().isEmpty()) {
+            editUser.setPhone(update.getPhone());
+        }
         write(users);
         return Optional.of(update);
     }
 
     @Override
-    public boolean delete(Long id) {
-        return false;
+    public Optional<User> delete(Long userId) {
+        List<User> users = findAll();
+        User editUser = users.stream()
+                .filter(u -> u.getId()
+                        .equals(userId))
+                .findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+        users.remove(editUser);
+        write(users);
+        return Optional.of(editUser);
     }
 
     private void write(List<User> users) {
         List<String> lines = new ArrayList<>();
-        for (User u: users) {
+        for (User u : users) {
             lines.add(mapper.toInput(u));
         }
         operation.saveAll(lines);

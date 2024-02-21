@@ -1,0 +1,3 @@
+1,Ali,Abdusamatov,998912060276
+3,FRD,Flint,555555
+4,Jawa,OOP,4895511
